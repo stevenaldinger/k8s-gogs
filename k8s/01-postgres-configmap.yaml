@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: vcs
+data:
+  db_name: gogs
+  db_user: gogs
+  # delete db_pass once postgres-secret is working properly
+  db_pass: gogspassword
+  data_dir: /var/lib/postgresql/data/pgdata
