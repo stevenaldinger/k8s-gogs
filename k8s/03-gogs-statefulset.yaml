@@ -41,9 +41,113 @@ spec:
         service: vcs
     spec:
       terminationGracePeriodSeconds: 10
+      initContainers:
+      - name: generate-gogs-config
+        image: stevenaldinger/k8s-envsubst:latest
+        env:
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: gogs-ini
+              key: app_name
+        - name: DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              name: gogs-ini
+              key: db_type
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: gogs-ini
+              key: db_host
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: gogs-ini
+              key: db_name
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: gogs-ini
+              key: db_user
+        - name: DB_PASS
+          valueFrom:
+            configMapKeyRef:
+              name: gogs-ini
+              key: db_pass
+        - name: DB_PASS
+          valueFrom:
+            configMapKeyRef:
+              name: gogs-ini
+              key: db_pass
+        - name: OUTPUT_DESTINATION
+          value: /gogs-config/app.ini
+        command:
+        - file_generator
+        args:
+        - |
+          APP_NAME = ${APP_NAME}
+          RUN_USER = git
+          RUN_MODE = prod
+
+          [database]
+          DB_TYPE  = ${DB_TYPE}
+          HOST     = ${DB_HOST}
+          NAME     = ${DB_NAME}
+          USER     = ${DB_USER}
+          PASSWD   = ${DB_PASS}
+          SSL_MODE = disable
+          PATH     = data/gogs.db
+
+          [repository]
+          ROOT = /data/git/gogs-repositories
+
+          [server]
+          DOMAIN           = localhost
+          HTTP_PORT        = 3000
+          ROOT_URL         = http://localhost:3000/
+          DISABLE_SSH      = false
+          SSH_PORT         = 22
+          START_SSH_SERVER = false
+          OFFLINE_MODE     = false
+
+          [mailer]
+          ENABLED = false
+
+          [service]
+          REGISTER_EMAIL_CONFIRM = false
+          ENABLE_NOTIFY_MAIL     = false
+          DISABLE_REGISTRATION   = false
+          ENABLE_CAPTCHA         = true
+          REQUIRE_SIGNIN_VIEW    = false
+
+          [picture]
+          DISABLE_GRAVATAR        = false
+          ENABLE_FEDERATED_AVATAR = true
+
+          [session]
+          PROVIDER = file
+
+          [log]
+          MODE      = file
+          LEVEL     = Info
+          ROOT_PATH = /app/gogs/log
+
+          [security]
+          INSTALL_LOCK = true
+          SECRET_KEY   = QC5KjsCQuSkVWYE
+        volumeMounts:
+        - name: gogs-ini-tmpl
+          mountPath: /conf
+        - name: gogs-config-dir
+          mountPath: /gogs-config
       containers:
       - name: gogs
         image: gogs/gogs
+        command:
+        - sh
+        - -c
+        - '/app/gogs/docker/start.sh cp -f /gogs-config/app.ini /data/gogs/conf/app.ini && chown -R git:git /data/gogs/conf && /bin/s6-svscan /app/gogs/docker/s6/'
         ports:
         - name: ssh
           containerPort: 22
@@ -65,7 +169,15 @@ spec:
         volumeMounts:
         - name: gogs-data
           mountPath: /data
+        - name: gogs-config-dir
+          mountPath: /gogs-config
       restartPolicy: Always
+      volumes:
+      - name: gogs-ini-tmpl
+        configMap:
+          name: gogs-ini-tmpl
+      - name: gogs-config-dir
+        emptyDir: {}
   volumeClaimTemplates:
   - metadata:
       name: gogs-data

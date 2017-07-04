@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: psql-seed-script
+  namespace: vcs
+data:
+  seed: |
+    #!/bin/bash
+
+    cp -f /pgfutter-dir/pgfutter /usr/bin/
+    chmod +x /usr/bin/pgfutter
+
+    export DB_USER=gogs
+    export DB_NAME=gogs
+    export DB_SCHEMA=public
+
+    for table in /sql/*.csv
+    do
+      pgfutter csv --delimiter \; ${table} --dbname gogs --username gogs --schema public
+    done

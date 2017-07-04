@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sql-files
+  namespace: vcs
+data:
+  access.csv: |
+    id;user_id;repo_id;mode
+  access_token.csv: |
+    id;uid;name;sha1;created_unix;updated_unix
+  action.csv: |
+    id;user_id;op_type;act_user_id;act_user_name;repo_id;repo_user_name;repo_name;ref_name;is_private;content;created_unix
+    1;1;1;1;gogs;1;gogs;first-repo;"";f;"";1499148115
+  attachment.csv: |
+    id;uuid;issue_id;comment_id;release_id;name;created_unix
+  collaboration.csv: |
+    id;repo_id;user_id;mode
+  comment.csv: |
+    id;type;poster_id;issue_id;commit_id;line;content;created_unix;updated_unix;commit_sha
+  deploy_key.csv: |
+    id;key_id;repo_id;name;fingerprint;created_unix;updated_unix
+  email_address.csv: |
+    id;uid;email;is_activated
+  follow.csv: |
+    id;user_id;follow_id
+  hook_task.csv: |
+    id;repo_id;hook_id;uuid;type;url;signature;payload_content;content_type;event_type;is_ssl;is_delivered;delivered;is_succeed;request_content;response_content
+  issue.csv: |
+    id;repo_id;index;poster_id;name;content;milestone_id;priority;assignee_id;is_closed;is_pull;num_comments;deadline_unix;created_unix;updated_unix
+  issue_label.csv: |
+    id;issue_id;label_id
+  issue_user.csv: |
+    id;uid;issue_id;repo_id;milestone_id;is_read;is_assigned;is_mentioned;is_poster;is_closed
+  label.csv: |
+    id;repo_id;name;color;num_issues;num_closed_issues
+  login_source.csv: |
+    id;type;name;is_actived;cfg;created_unix;updated_unix
+  milestone.csv: |
+    id;repo_id;name;content;is_closed;num_issues;num_closed_issues;completeness;deadline_unix;closed_date_unix
+  mirror.csv: |
+    id;repo_id;interval;enable_prune;updated_unix;next_update_unix
+  notice.csv: |
+    id;type;description;created_unix
+  org_user.csv: |
+    id;uid;org_id;is_public;is_owner;num_teams
+  protect_branch.csv: |
+    id;repo_id;name;protected;require_pull_request;enable_whitelist;whitelist_user_i_ds;whitelist_team_i_ds
+  protect_branch_whitelist.csv: |
+    id;protect_branch_id;repo_id;name;user_id
+  public_key.csv: |
+    id;owner_id;name;fingerprint;content;mode;type;created_unix;updated_unix
+  pull_request.csv: |
+    id;type;status;issue_id;index;head_repo_id;base_repo_id;head_user_name;head_branch;base_branch;merge_base;has_merged;merged_commit_id;merger_id;merged_unix
+  release.csv: |
+    id;repo_id;publisher_id;tag_name;lower_tag_name;target;title;sha1;num_commits;note;is_draft;is_prerelease;created_unix
+  repository.csv: |
+    id;owner_id;lower_name;name;description;website;default_branch;size;num_watches;num_stars;num_forks;num_issues;num_closed_issues;num_pulls;num_closed_pulls;num_milestones;num_closed_milestones;is_private;is_bare;is_mirror;enable_wiki;allow_public_wiki;enable_external_wiki;external_wiki_url;enable_issues;allow_public_issues;enable_external_tracker;external_tracker_url;external_tracker_format;external_tracker_style;enable_pulls;is_fork;fork_id;created_unix;updated_unix
+    1;1;first-repo;first-repo;My first repository on my personal gogs server!;"";master;0;1;0;0;0;0;0;0;0;0;f;f;f;t;f;f;"";t;f;f;"";"";numeric;t;f;0;1499148115;1499148115
+  star.csv: |
+    id;uid;repo_id
+  team.csv: |
+    id;org_id;lower_name;name;description;authorize;num_repos;num_members
+  team_repo.csv: |
+    id;org_id;team_id;repo_id
+  team_user.csv: |
+    id;org_id;team_id;uid
+  two_factor.csv: |
+    id;user_id;secret;created_unix
+  two_factor_recovery_code.csv: |
+    id;user_id;code;is_used
+  upload.csv: |
+    id;uuid;name
+  user.csv: |
+    id;lower_name;name;full_name;email;passwd;login_type;login_source;login_name;type;location;website;rands;salt;created_unix;updated_unix;last_repo_visibility;max_repo_creation;is_active;is_admin;allow_git_hook;allow_import_local;prohibit_login;avatar;avatar_email;use_custom_avatar;num_followers;num_following;num_stars;num_repos;description;num_teams;num_members
+    2;drone;drone;"";drone@drone.io;3d3c3af5b1a633d4d51b8c9f07b2dbc5ced884d0ffff803e94363da97a182830555fd4a01deb106cd4e35d21d18dbff0f928;0;0;"";0;"";"";iNuBwqPkTJ;4KpPJoyFUj;1499148039;1499148039;f;-1;t;f;f;f;f;cec9ce60c3b9d3541c06d534060c4fe5;drone@drone.io;f;0;0;0;0;"";0;0
+    1;gogs;gogs;"";gogs@gogs.io;3391dff25dfadc3e1af78f48f4b320fc914fbb9b4959d7fd52af95cf3777461ec0fccbebcece1376a665509d6ee345b470aa;0;0;"";0;"";"";NIxHRqwhu8;pqNd5Ab35S;1499148025;1499148115;f;-1;t;t;f;f;f;f92f6d103726298d6b601f3df8851a29;gogs@gogs.io;f;0;0;0;1;"";0;0
+  version.csv: |
+    id;version
+    1;17
+  watch.csv: |
+    id;user_id;repo_id
+    1;1;1
+  webhook.csv: |
+    id;repo_id;org_id;url;content_type;secret;events;is_ssl;is_active;hook_task_type;meta;last_status;created_unix;updated_unix

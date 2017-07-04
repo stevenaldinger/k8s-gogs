@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gogs-ini
+  namespace: vcs
+data:
+  app_name: Gogs
+  db_type: postgres
+  db_host: postgres.vcs.svc.cluster.local:5432
+  db_name: gogs
+  db_user: gogs
+  db_pass: gogspassword

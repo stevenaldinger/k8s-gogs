@@ -1,58 +1,52 @@
-# Gogs deployment with Postgres
+# Gogs Deployment with PostgreSQL on Kubernetes
 
-If you don't have a Kubernetes cluster to work with yet, check out my [local-kubernetes-bootstrap](https://github.com/stevenaldinger/local-kubernetes-bootstrap) repo to get started.
+Before anything else I want to give a shoutout to my personal hero and role model, [Kelsey Hightower](https://twitter.com/kelseyhightower) [github](https://github.com/kelseyhightower) [youtube](https://www.youtube.com/user/MadHatterConfigMgmt). I got lucky enough to catch one of his demos in Charleston and speak to him after which was what inspired me to start open sourcing some projects to share with the community. Check out some of his videos sometime, I guarantee they'll be some of the most entertaining technical talks you've witnessed.
 
-[Gogs is a painless self-hosted Git service.](https://github.com/gogits/gogs/tree/master/docker) https://gogs.io
+[Gogs](https://gogs.io) is a [painless self-hosted Git service.](https://github.com/gogits/gogs/tree/master)
 
-[PostgreSQL is an advanced object-relational database management system that supports an extended subset of the SQL standard, including transactions, foreign keys, subqueries, triggers, user-defined types and functions.](https://github.com/postgres/postgres) https://www.postgresql.org/
+[PostgreSQL](https://www.postgresql.org/) is an [advanced object-relational database management system](https://github.com/postgres/postgres) that supports an extended subset of the SQL standard, including transactions, foreign keys, subqueries, triggers, user-defined types and functions.
 
-# TODO:
-
-1. Using a `secret` to set the `gogs` database password makes login fail for some reason. For the time being the password is just deployed in a `configmap`, although this is insecure.
-2. Using proper `readinessProbe` on postgres container always fails with: `FATAL:  role "root" does not exist`
+Be sure to check out the [drone.io deployment repo](https://github.com/stevenaldinger/k8s-drone) after launching this to add instant CI/CD to your new cluster in one command!
 
 # Deploying Gogs and Postgres
 
+## Prerequisites
+
+If you don't have a Kubernetes cluster to work with yet, check out my [local-kubernetes-bootstrap](https://github.com/stevenaldinger/local-kubernetes-bootstrap) repo to get started locally with Minikube or go dive into [Google Container Engine](https://cloud.google.com/container-engine/) for a hosted solution.
+
+## Quickstart
+
 `kubectl apply -f ./k8s`
-
-## Wait until everything is up and running
-
-`while :; do kubectl get svc,rc,po,deploy,statefulset,secrets,configmaps --all-namespaces; kubectl get pv; sleep 5; done`
 
 ## Port forwarding
 
-Once the pods are created, you can forward the `gogs` ports and view `gogs` in your browser.
+Once the pods are created, forward port 3000 (or any other) on your local machine to port 3000 of the `gogs` pod to make the web UI accessible in your browser. Two users will already be available, `gogs` (which has an example repository created as well and is intended to be used by you for instant exploring and [drone.io continuous integration and deployment](https://github.com/stevenaldinger/k8s-drone)) and `drone` which is intended to work as a service account.
 
-`kubectl port-forward gogs-0 -n vcs 3000:3000 2222:22`
+`kubectl port-forward gogs-0 -n vcs 3000:3000`
 
-Navigate to `http://localhost:3000/install` to begin configuring your new `gogs` server.
+Navigate to [http://localhost:3000](http://localhost:3000) to begin using your new `Gogs` git service.
 
-![Database Settings](images/database-settings.png)
+### Users
 
-![General Settings](images/general-settings.png)
+```
+user: gogs
+pass: gogs
+email: gogs@gogs.io
 
-## Drone Integration
+user: drone
+pass: drone
+email: drone@drone.io
+```
 
-Be sure to make a user with username `drone` and password `dronepass` if you'll be deploying the k8s-drone project with `gogs` and don't want to alter the `drone` secret.
+## Contributing
 
-## Viewing logs
+Any contributions are extremely welcome and appreciated. If you see ways to improve the deployments and know how to make it happen, open up a pull request with a brief description of what you did and I'll gladly take a look and merge it in. If you see ways to improve the deployments and don't know how to make it happen, don't be shy about creating a new issue and I'll try to tackle it when I have some time.
 
-`kubectl logs -f postgres-0 -n vcs`
+Any questions you come up with are also important contributions if they're made publicly where others can stumble across them. I'm still learning so may not have a good answer for you immediately but I promise you won't be ignored.
 
-`kubectl logs -f gogs-0 -n vcs`
+# TODO / Known Issues:
 
-# Create a secret
-
-To encode a password for use with a secret you can run:
-
-`echo gogspassword | base64`
-
-# Changing the gogs database password
-
-If for any reason you want to change the `gogs` database password you can do so with this command:
-
-`kubectl exec postgres-0 -n vcs -- bash -c "psql -U gogs -d gogs -c \"ALTER USER gogs WITH ENCRYPTED PASSWORD 'gogspassword'\""`
-
-This writes the plain text password to `.psql_history` and should be deleted to be extra safe.
-
-`rm ~/.psql_history`
+1. Using a `secret` to set the `gogs` database password makes login fail for some reason. For the time being the password is just deployed in a `configmap`, although this is insecure.
+2. Attempting to use a proper `readinessProbe` on postgres container always fails with: `FATAL:  role "root" does not exist`. This needs a flag to run it as the `gogs` user.
+3. Make database seeding configurable and in an init-container. That'll allow for random password generation on each deployment to make it more secure by default and also allow people to choose their own initial username.
+4. Add an example `.drone.yml` to the example repo
